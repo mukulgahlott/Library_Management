@@ -1,186 +1,116 @@
 package org.coretechies.ui.updateBooks;
 
-import org.coretechies.connection.CreateConnection;
-import org.coretechies.storeBook.BookDetails;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-
-import java.awt.*;
-import java.awt.event.AWTEventListener;
-import java.awt.event.MouseEvent;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.coretechies.connection.CreateConnection.st;
-import static org.coretechies.ui.AddBookScreen.*;
-import static org.coretechies.ui.LibraryManageUi.*;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
+import org.coretechies.storeBook.BookDetails;
+import org.coretechies.ui.AddBookScreen;
 
 public class UpdateBooksTable {
+    private final Connection connection;
+    private final DefaultTableModel tableModel;
+    private JFrame parentFrame = new JFrame();
 
-    public static int id;
-    static int[] key;
-    protected String name, subject, author;
-    public ResultSet showQ;
-    public int addQ;
-    public static String sortQuery;
-    final String sortQueryN = "SELECT * FROM book " + "ORDER BY bookName;";
-    final String sortQueryS = "SELECT * FROM book " + "ORDER BY Subject;";
-    final String sortQueryA = "SELECT * FROM book " + "ORDER BY Author;";
-    final String sortQueryND = "SELECT * FROM book " + "ORDER BY BookName desc;";
-    final String sortQuerySD = "SELECT * FROM book " + "ORDER BY Subject desc;";
-    final String sortQueryAD = "SELECT * FROM book " + "ORDER BY Author desc;";
-    protected Object[] rowData;
-    static List<BookDetails> bookDetail = new ArrayList<>();
+    public UpdateBooksTable(Connection connection, DefaultTableModel tableModel) {
+        this.connection = connection;
+        this.tableModel = tableModel;
+        this.parentFrame = parentFrame;
+    }
 
-    //print Book table
     public void printTable() {
-        //  Create the table model and set column names
-        String[] columnNames = new String[]{"NAME", "SUBJECT", "AUTHOR","SELECT"};
-        bookDetail.clear();
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                //all cells false
-                if (column==3){
-                    return true;
-                }
-                return false;
+        tableModel.setRowCount(0); // Clear the table
+        String query = "SELECT * FROM book";
+
+        try (ResultSet rs = connection.createStatement().executeQuery(query)) {
+            while (rs.next()) {
+                tableModel.addRow(new Object[]{
+                        rs.getString("BookName"),
+                        rs.getString("Subject"),
+                        rs.getString("Author"),
+                        rs.getBoolean("Select1")
+                });
             }
-
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex==3){
-                    return Boolean.class;
-                }
-                return String.class;
-            }
-        };
-
-        CreateConnection connection = CreateConnection.getInstance();
-        try {
-            connection.connectDB();
-            if (selectedItem.equals("Author")) {
-                sortQuery = sortQueryA;
-            } else if (selectedItem.equals("Subject")) {
-                sortQuery = sortQueryS;
-            } else if (selectedItem.equals("AuthorD")) {
-                sortQuery = sortQueryAD;
-            } else if (selectedItem.equals("SubjectD")) {
-                sortQuery = sortQuerySD;
-            }else if (selectedItem.equals("NameD")) {
-                sortQuery = sortQueryND;
-            }
-            else {
-                sortQuery = sortQueryN;
-            }
-
-            showQ = st.executeQuery(sortQuery);
-            while (showQ.next()) {
-                System.out.println(showQ.getString("BookName") + " " + showQ.getString("Subject") + " " + showQ.getString("Author")+showQ.getBoolean("Select1"));
-                rowData = new Object[]{showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")};
-                tableModel.addRow(rowData);
-                bookDetail.add(new BookDetails(showQ.getInt("id"), showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")));
-
-            }
-            TableColumnModel setColumn = booksTable.getColumnModel();
-
-            booksTable.setModel(tableModel);
-
-            //   identify the selecting date
-            booksTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    // Get the selected row
-                     key = booksTable.getSelectedRows();
-                    for (Integer i : key){
-                        id = bookDetail.get(i).id();
-                    }
-                }
-            });
         } catch (SQLException e) {
-            System.out.println("404 : DATA NOT FOUND");
+            e.printStackTrace();
         }
     }
 
-    //delete Book from database
-    public void delete() {
-            try {
-                    String DeleteQuery = "DELETE FROM book WHERE select1 = true ;";
-                    st.executeUpdate(DeleteQuery);
-                printTable();
-                id = 0;
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(mainFrame, "please select the book");
+    public void search(String selectedItem, String searchText) {
+        List<BookDetails> books = new ArrayList<>();
+        String query = "SELECT * FROM book WHERE LOWER(" + selectedItem + ") LIKE ?";
+
+        try (var ps = connection.prepareStatement(query)) {
+            ps.setString(1, "%" + searchText.toLowerCase() + "%");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                books.add(new BookDetails(
+                        rs.getInt("id"),
+                        rs.getString("BookName"),
+                        rs.getString("Subject"),
+                        rs.getString("Author")
+                ));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+        tableModel.setRowCount(0);
+        for (BookDetails book : books) {
+            tableModel.addRow(new Object[]{book.name(), book.subject(), book.author()});
+        }
     }
-
 
     public void addBooksInTable() {
-        name = nameT.getText();
-        subject = subjectT.getText();
-        author = authorT.getText();
+        String name = AddBookScreen.nameT.getText();
+        String subject = AddBookScreen.subjectT.getText();
+        String author = AddBookScreen.authorT.getText();
 
-        if (!name.isBlank() && !subject.isBlank() && !author.isBlank()) {
-            String addQuery = "INSERT INTO Book (BookName, Subject, Author)" + "VALUES ('" + name + "'," + "'" + subject + "','" + author + "')";
+        String query = "INSERT INTO book (BookName, Subject, Author, Select1) VALUES (?, ?, ?, ?)";
 
-            try {
-                addQ = st.executeUpdate(addQuery);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(addBookF, "Error : Some thing went wrong ");
-                addBookF.dispose();
-
-            }
+        try (var ps = connection.prepareStatement(query)) {
+            ps.setString(1, name);
+            ps.setString(2, subject);
+            ps.setString(3, author);
+            ps.setBoolean(4, false);
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(AddBookScreen.addBookF, "Book added successfully");
             printTable();
-            addBookF.dispose();
-            allow = true;
-
-        } else {
-            JOptionPane.showMessageDialog(addBookF, "Please fill the values");
-        }
-
-    }
-
-    public void search() {
-        String[] columnNames = new String[]{"NAME", "SUBJECT", "AUTHOR"};
-        DefaultTableModel searchTableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                //all cells false
-                return false;
-            }
-        };
-        try {
-
-            showQ = st.executeQuery(sortQuery);
-            String key = searchT.getText().toLowerCase();
-            while (showQ.next()) {
-                name = showQ.getString("BookName");
-                subject = showQ.getString("Subject");
-                author = showQ.getString("Author");
-
-                if (name.toLowerCase().contains(key) | subject.toLowerCase().contains(key) | author.toLowerCase().contains(key)) {
-
-                    System.out.println(showQ.getString("BookName") + " " + showQ.getString("Subject") + " " + showQ.getString("Author"));
-                    rowData = new Object[]{showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")};
-                    searchTableModel.addRow(rowData);
-                }
-            }
-            if (searchTableModel.getRowCount() == 0) {
-                System.out.println("Contact not found");
-            }
-            booksTable.setModel(searchTableModel);
         } catch (SQLException e) {
-            System.out.println("404 : DATA NOT FOUND");
+            e.printStackTrace();
         }
     }
 
+    public void delete() {
+        List<Integer> idsToDelete = new ArrayList<>();
+        for (int i = 0; i < tableModel.getRowCount(); i++) {
+            boolean isSelected = (boolean) tableModel.getValueAt(i, 3);
+            if (isSelected) {
+                idsToDelete.add((int) tableModel.getValueAt(i, 0));
+            }
+        }
 
+        if (idsToDelete.isEmpty()) {
+            JOptionPane.showMessageDialog(parentFrame, "No books selected for deletion");
+        } else {
+            String query = "DELETE FROM book WHERE id IN (" + idsToDelete.toString().replaceAll("[\\[\\]]", "") + ")";
+            try {
+                connection.createStatement().executeUpdate(query);
+                JOptionPane.showMessageDialog(parentFrame, "Selected books deleted successfully");
+                printTable();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public int getBookId(int rowIndex) {
+        return (int) tableModel.getValueAt(rowIndex, 0);
+    }
 }

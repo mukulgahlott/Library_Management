@@ -1,29 +1,33 @@
 package org.coretechies.ui;
 
-import org.coretechies.ui.updateBooks.UpdateBooksTable;
-
 import javax.swing.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 
-import static org.coretechies.ui.LibraryManageUi.allow;
+import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
 public class AddBookScreen {
-
     public static JFrame addBookF;
     protected JLabel nameL, subjectL, authorL;
     public static JTextField nameT, subjectT, authorT;
     protected JButton saveBook, closeB;
+    private final Connection connection;
+    private final UpdateBooksTable updateBooksTable;
+
+    public AddBookScreen(Connection connection, UpdateBooksTable updateBooksTable) {
+        this.connection = connection;
+        this.updateBooksTable = updateBooksTable;
+    }
 
     public void addContactFrame() {
-
         addBookF = new JFrame("Add and Update Book");
         addBookF.setSize(380, 200);
         addBookF.setLayout(null);
     }
 
     public void enterContactDetails() {
-
         nameL = new JLabel("Book Name :   ");
         nameL.setBounds(30, 10, 100, 20);
         subjectL = new JLabel("Subject :");
@@ -53,9 +57,7 @@ public class AddBookScreen {
         saveBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UpdateBooksTable saveInDb = new UpdateBooksTable();
-                saveInDb.addBooksInTable();
-
+                updateBooksTable.addBooksInTable();
             }
         });
     }
@@ -69,19 +71,15 @@ public class AddBookScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addBookF.dispose();
-                allow =true;
             }
         });
     }
 
     public void showAddNewContactScreen() {
-
         addContactFrame();
         enterContactDetails();
         saveButton();
         closeButton();
         addBookF.setVisible(true);
-
     }
-
 }
