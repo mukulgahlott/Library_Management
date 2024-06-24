@@ -1,4 +1,5 @@
 package org.coretechies.ui;
+
 import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
@@ -12,20 +13,24 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.id;
 
 
 public class LibraryManageUi {
 
 
     private String key;
+    public static boolean allow = true;
     public static JFrame mainFrame;
     protected JPanel booksPanel;
     public static JTable booksTable;
-    public static JButton addNewBook, delete ,edit ;
+    public static JButton addNewBook, delete, edit;
     protected JLabel searchL;
     public static JTextField searchT;
     public static DefaultTableModel tableModel;
-    public static String selectedItem = "Name";
+    public static String selectedItem = "";
 
 
     // Build the main frame
@@ -70,20 +75,28 @@ public class LibraryManageUi {
         });
 
     }
-//    build ComboBox for short Books as user want
+
+    //  build ComboBox for short Books as user want
     public void comboBox() {
-        String[] choices = {"Name", "Subject", "Author"};
+        String[] choices = {"Name", "Subject", "Author",};
         JComboBox<String> cb = new JComboBox<>(choices);
-        cb.setBounds(365, 35, 105, 30);
+        cb.setBounds(365, 17, 105, 30);
         cb.setVisible(true);
         mainFrame.add(cb);
         cb.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String s = selectedItem;
                 selectedItem = (String) cb.getSelectedItem();
-                UpdateBooksTable sortTable = new UpdateBooksTable();
-                sortTable.printTable();
-
+                assert selectedItem != null;
+                if (selectedItem.equals(s)) {
+                    selectedItem = (String) cb.getSelectedItem() + "D";
+                    UpdateBooksTable sortTable = new UpdateBooksTable();
+                    sortTable.printTable();
+                } else {
+                    UpdateBooksTable sortTable = new UpdateBooksTable();
+                    sortTable.printTable();
+                }
             }
         });
     }
@@ -92,14 +105,12 @@ public class LibraryManageUi {
     public void contactTablePanel() {
 
         booksPanel = new JPanel();
-        booksPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Books",
-                TitledBorder.LEFT, TitledBorder.TOP));
+        booksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Books", TitledBorder.LEFT, TitledBorder.TOP));
         booksPanel.setBounds(20, 60, 443, 400);
         booksPanel.setLayout(new BorderLayout());
         mainFrame.add(booksPanel);
 
-        tableModel = new DefaultTableModel(new String[]{"NAME", "SUBJECT", "AUTHOR"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"NAME", "SUBJECT", "AUTHOR","SELECT"}, 0);
 
         booksTable = new JTable(tableModel);
         booksTable.getTableHeader().setReorderingAllowed(false);
@@ -110,34 +121,50 @@ public class LibraryManageUi {
         showBook.printTable();
     }
 
-//    edit button to Update the contacts
-    public void editButton(){
-        edit= new JButton("Edit");
-        edit.setBounds(465 ,90,40,20);
+    // edit button to Update the contacts
+    public void editButton() {
+        edit = new JButton("Edit");
+        edit.setBounds(222, 470, 60, 30);
         mainFrame.add(edit);
+
         edit.addActionListener(e -> {
-            UpdateBook fill =new UpdateBook();
-            UpdateBookUi showUpdateUi = new UpdateBookUi();
-            showUpdateUi.updateScreen();
-            try {
-                fill.fillUpdate();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+            if (!(id == 0)) {
+                if (allow) {
+                    allow = false;
+                    UpdateBookUi showUpdateUi = new UpdateBookUi();
+                    showUpdateUi.updateScreen();
+                    try {
+                        UpdateBook fill = new UpdateBook();
+                        fill.fillUpdate();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    //alert the user that the frame is already open
+                    //I recommend a JOptionPane such as this
+                    JOptionPane.showMessageDialog(mainFrame, "A window is already open");
+                }
+            } else {
+                JOptionPane.showMessageDialog(mainFrame, "please select the book ");
             }
         });
 
     }
 
-
     // Build a button to open Add New BOOK screen
     public void addBook() {
+
         addNewBook = new JButton("Add new Book");
-        addNewBook.setBounds(100, 470, 150, 30);
+        addNewBook.setBounds(70, 470, 130, 30);
         mainFrame.add(addNewBook);
         addNewBook.addActionListener(e -> {
-            AddBookScreen showPanel = new AddBookScreen();
-            showPanel.showAddNewContactScreen();
-
+            if (allow) {
+                allow = false;
+                AddBookScreen showPanel = new AddBookScreen();
+                showPanel.showAddNewContactScreen();
+            } else {
+                JOptionPane.showMessageDialog(mainFrame, "A window is already open");
+            }
         });
 
     }
@@ -151,11 +178,9 @@ public class LibraryManageUi {
             del.delete();
 
 
-
         });
 
     }
-
 
     // Function to show ContactBookScreen
     public void showBookManagementScreen() {

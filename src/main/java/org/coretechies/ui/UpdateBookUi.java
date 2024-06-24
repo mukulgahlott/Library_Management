@@ -1,8 +1,14 @@
 package org.coretechies.ui;
 
+import org.coretechies.manupulation.UpdateBook;
+import org.coretechies.ui.updateBooks.UpdateBooksTable;
+
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.id;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.sql.SQLException;
 
 import static org.coretechies.ui.AddBookScreen.addBookF;
 
@@ -27,7 +33,16 @@ public class UpdateBookUi {
             saveUpdate.setBounds(100,140,60,20);
             addBookF.add(saveUpdate);
             saveUpdate.addActionListener(e -> {
+                UpdateBook update = new UpdateBook();
+                try {
+                    update.updateChanges();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                id = 0;
                 addBookF.dispose();
+                UpdateBooksTable printUpdate = new UpdateBooksTable();
+                printUpdate.printTable();
             });
 
         }
