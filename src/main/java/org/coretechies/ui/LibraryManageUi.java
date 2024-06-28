@@ -4,8 +4,10 @@ import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
 import java.awt.*;
+import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 
 import javax.swing.*;
@@ -15,13 +17,12 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.id;
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 
 public class LibraryManageUi {
 
 
-    private String key;
     public static boolean allow = true;
     public static JFrame mainFrame;
     protected JPanel booksPanel;
@@ -31,6 +32,7 @@ public class LibraryManageUi {
     public static JTextField searchT;
     public static DefaultTableModel tableModel;
     public static String selectedItem = "";
+    UpdateBooksTable showBook = new UpdateBooksTable();
 
 
     // Build the main frame
@@ -69,8 +71,13 @@ public class LibraryManageUi {
             }
 
             private void searchAndUpdate() {
-                UpdateBooksTable searching = new UpdateBooksTable();
-                searching.search();
+                String searchText = searchT.getText();
+                if (searchText.isBlank()) {
+                    showBook.printTable();
+                } else {
+                    UpdateBooksTable searching = new UpdateBooksTable();
+                    searching.search();
+                }
             }
         });
 
@@ -94,8 +101,8 @@ public class LibraryManageUi {
                     UpdateBooksTable sortTable = new UpdateBooksTable();
                     sortTable.printTable();
                 } else {
-                    UpdateBooksTable sortTable = new UpdateBooksTable();
-                    sortTable.printTable();
+
+                    showBook.printTable();
                 }
             }
         });
@@ -110,14 +117,13 @@ public class LibraryManageUi {
         booksPanel.setLayout(new BorderLayout());
         mainFrame.add(booksPanel);
 
-        tableModel = new DefaultTableModel(new String[]{"NAME", "SUBJECT", "AUTHOR","SELECT"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID","NAME", "SUBJECT", "AUTHOR","SELECT"}, 0);
 
         booksTable = new JTable(tableModel);
         booksTable.getTableHeader().setReorderingAllowed(false);
 
         booksPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
         // Refresh the table to display data
-        UpdateBooksTable showBook = new UpdateBooksTable();
         showBook.printTable();
     }
 
@@ -128,7 +134,7 @@ public class LibraryManageUi {
         mainFrame.add(edit);
 
         edit.addActionListener(e -> {
-            if (!(id == 0)) {
+            if (!(idc == 0)) {
                 if (allow) {
                     allow = false;
                     UpdateBookUi showUpdateUi = new UpdateBookUi();
@@ -181,7 +187,21 @@ public class LibraryManageUi {
         });
 
     }
-
+    public void deSelect() {
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            @Override
+            public void eventDispatched(AWTEvent event) {
+                if (event.getID() == MouseEvent.MOUSE_CLICKED) {
+                    MouseEvent mevent = (MouseEvent) event;
+                    int row = booksTable.rowAtPoint(mevent.getPoint());
+                    if (row == -1) {
+                        booksTable.clearSelection();
+                        allow = false;
+                    }
+                }
+            }
+        }, AWTEvent.MOUSE_EVENT_MASK);
+    }
     // Function to show ContactBookScreen
     public void showBookManagementScreen() {
         contactHomeFrame();
@@ -191,7 +211,7 @@ public class LibraryManageUi {
         editButton();
         addBook();
         deleteBook();
-        UpdateBooksTable select = new UpdateBooksTable();
+        deSelect();
         mainFrame.setVisible(true);
 
     }

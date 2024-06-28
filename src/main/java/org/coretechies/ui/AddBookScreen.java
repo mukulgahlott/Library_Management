@@ -80,6 +80,7 @@ public class AddBookScreen {
         enterContactDetails();
         saveButton();
         closeButton();
+
         addBookF.setVisible(true);
 
     }

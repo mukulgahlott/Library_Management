@@ -10,11 +10,11 @@ import static org.coretechies.connection.CreateConnection.st;
 import static org.coretechies.ui.AddBookScreen.*;
 import static org.coretechies.ui.LibraryManageUi.allow;
 import static org.coretechies.ui.LibraryManageUi.mainFrame;
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.id;
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 
 public class UpdateBook {
-    final String showQuery = "SELECT * FROM book where id = " + UpdateBooksTable.id + ";";
+    final String showQuery = "SELECT * FROM book where id = " + UpdateBooksTable.idc + ";";
 
 
     public void fillUpdate() throws SQLException {
@@ -33,7 +33,7 @@ public class UpdateBook {
         String author = authorT.getText();
         String updateQ = "UPDATE Book " +
                 "SET BookName = '" + name + "', Subject = '" + subject + "', Author = '" + author + "' " +
-                "WHERE ID = " + id + ";";
+                "WHERE ID = " + idc + ";";
 
         if (!name.isBlank() && !subject.isBlank() && !author.isBlank()) {
             st.executeUpdate(updateQ);

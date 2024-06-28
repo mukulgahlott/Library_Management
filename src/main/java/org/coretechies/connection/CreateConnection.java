@@ -8,7 +8,6 @@ public class CreateConnection {
     final String url = "jdbc:mysql://localhost:3306/my_database";
     final String user = "root";
     final String password = "pass@123";
-    final String query1 = "SELECT * FROM BOOK;";
     public static Statement st;
 
     //    Empty constructor

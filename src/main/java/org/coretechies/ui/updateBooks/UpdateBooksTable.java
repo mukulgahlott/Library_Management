@@ -24,7 +24,7 @@ import static org.coretechies.ui.LibraryManageUi.*;
 
 public class UpdateBooksTable {
 
-    public static int id;
+    public static int idc;
     static int[] key;
     protected String name, subject, author;
     public ResultSet showQ;
@@ -42,13 +42,13 @@ public class UpdateBooksTable {
     //print Book table
     public void printTable() {
         //  Create the table model and set column names
-        String[] columnNames = new String[]{"NAME", "SUBJECT", "AUTHOR","SELECT"};
+        String[] columnNames = new String[]{"ID","NAME", "SUBJECT", "AUTHOR","SELECT"};
         bookDetail.clear();
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable (int row, int column) {
                 //all cells false
-                if (column==3){
+                if (column==4){
                     return true;
                 }
                 return false;
@@ -56,7 +56,7 @@ public class UpdateBooksTable {
 
             @Override
             public Class<?> getColumnClass(int columnIndex) {
-                if (columnIndex==3){
+                if (columnIndex==4){
                     return Boolean.class;
                 }
                 return String.class;
@@ -83,13 +83,11 @@ public class UpdateBooksTable {
 
             showQ = st.executeQuery(sortQuery);
             while (showQ.next()) {
-                System.out.println(showQ.getString("BookName") + " " + showQ.getString("Subject") + " " + showQ.getString("Author")+showQ.getBoolean("Select1"));
-                rowData = new Object[]{showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")};
+                rowData = new Object[]{showQ.getInt("id"),showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author"),showQ.getBoolean("Select1")};
                 tableModel.addRow(rowData);
                 bookDetail.add(new BookDetails(showQ.getInt("id"), showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")));
 
             }
-            TableColumnModel setColumn = booksTable.getColumnModel();
 
             booksTable.setModel(tableModel);
 
@@ -97,13 +95,15 @@ public class UpdateBooksTable {
             booksTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 @Override
                 public void valueChanged(ListSelectionEvent e) {
+                    allow = true;
                     // Get the selected row
                      key = booksTable.getSelectedRows();
                     for (Integer i : key){
-                        id = bookDetail.get(i).id();
+                        idc = bookDetail.get(i).id();
                     }
                 }
             });
+
         } catch (SQLException e) {
             System.out.println("404 : DATA NOT FOUND");
         }
@@ -112,10 +112,24 @@ public class UpdateBooksTable {
     //delete Book from database
     public void delete() {
             try {
-                    String DeleteQuery = "DELETE FROM book WHERE select1 = true ;";
-                    st.executeUpdate(DeleteQuery);
-                printTable();
-                id = 0;
+                boolean deleteIndex = false ;
+
+                for (int j = 0;j<bookDetail.size(); j++) {
+                   deleteIndex = (boolean) booksTable.getValueAt(j, 4);
+
+                   if (deleteIndex){
+                       int id = (int) booksTable.getValueAt(j,0);
+                       String DeleteQuery = "DELETE FROM book WHERE Id = "+ id +";";
+                       st.executeUpdate(DeleteQuery);
+                   }
+                }
+                if (searchT.getText().isBlank()){
+                    printTable();
+                }
+                else {
+                    search();
+                }
+                idc = 0;
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(mainFrame, "please select the book");
             }
@@ -149,13 +163,24 @@ public class UpdateBooksTable {
     }
 
     public void search() {
-        String[] columnNames = new String[]{"NAME", "SUBJECT", "AUTHOR"};
+        String[] columnNames = new String[]{"ID","NAME", "SUBJECT", "AUTHOR","SELECT"};
+        bookDetail.clear();
         DefaultTableModel searchTableModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 //all cells false
+                if (column==4){
+                    return true;
+                }
                 return false;
             }
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex==4){
+                return Boolean.class;
+            }
+            return String.class;
+        }
         };
         try {
 
@@ -168,9 +193,9 @@ public class UpdateBooksTable {
 
                 if (name.toLowerCase().contains(key) | subject.toLowerCase().contains(key) | author.toLowerCase().contains(key)) {
 
-                    System.out.println(showQ.getString("BookName") + " " + showQ.getString("Subject") + " " + showQ.getString("Author"));
-                    rowData = new Object[]{showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")};
+                    rowData = new Object[]{showQ.getInt("Id"),showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author"),showQ.getBoolean("Select1")};
                     searchTableModel.addRow(rowData);
+                    bookDetail.add(new BookDetails(showQ.getInt("id"), showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author")));
                 }
             }
             if (searchTableModel.getRowCount() == 0) {

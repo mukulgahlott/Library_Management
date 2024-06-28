@@ -3,7 +3,7 @@ package org.coretechies.ui;
 import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.id;
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -39,7 +39,7 @@ public class UpdateBookUi {
                 } catch (SQLException ex) {
                     throw new RuntimeException(ex);
                 }
-                id = 0;
+                idc = 0;
                 addBookF.dispose();
                 UpdateBooksTable printUpdate = new UpdateBooksTable();
                 printUpdate.printTable();
