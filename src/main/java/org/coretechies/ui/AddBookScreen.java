@@ -5,8 +5,11 @@ import org.coretechies.ui.updateBooks.UpdateBooksTable;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import static org.coretechies.ui.LibraryManageUi.allow;
+import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 public class AddBookScreen {
 
@@ -20,6 +23,13 @@ public class AddBookScreen {
         addBookF = new JFrame("Add and Update Book");
         addBookF.setSize(380, 200);
         addBookF.setLayout(null);
+
+        addBookF.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                allow = true;
+            }
+        });
     }
 
     public void enterContactDetails() {
@@ -55,7 +65,6 @@ public class AddBookScreen {
             public void actionPerformed(ActionEvent e) {
                 UpdateBooksTable saveInDb = new UpdateBooksTable();
                 saveInDb.addBooksInTable();
-
             }
         });
     }
@@ -69,7 +78,7 @@ public class AddBookScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 addBookF.dispose();
-                allow =true;
+                allow = true;
             }
         });
     }

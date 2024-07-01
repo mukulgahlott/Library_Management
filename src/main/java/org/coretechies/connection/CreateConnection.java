@@ -1,9 +1,14 @@
 package org.coretechies.connection;
 
+import com.nqadmin.rowset.JdbcRowSetImpl;
+import javax.sql.RowSet;
+import javax.sql.RowSetEvent;
 import java.sql.*;
+
 
 public class CreateConnection {
 
+    RowSet rowSet = new JdbcRowSetImpl();
     private static CreateConnection instance;
     final String url = "jdbc:mysql://localhost:3306/my_database";
     final String user = "root";
@@ -23,16 +28,16 @@ public class CreateConnection {
         return instance;
     }
 
-//create connection with database
+    //create connection with database
     public void connectDB() {
         try {
             Connection con = DriverManager.getConnection(url, user, password);
             st = con.createStatement();
 
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
 
 }

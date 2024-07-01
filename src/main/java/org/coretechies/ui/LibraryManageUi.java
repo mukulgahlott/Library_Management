@@ -196,7 +196,7 @@ public class LibraryManageUi {
                     int row = booksTable.rowAtPoint(mevent.getPoint());
                     if (row == -1) {
                         booksTable.clearSelection();
-                        allow = false;
+                        idc =0;
                     }
                 }
             }
