@@ -10,7 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import static org.coretechies.ui.LibraryManageUi.allow;
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 public class AddBookScreen {
 
@@ -57,9 +56,9 @@ public class AddBookScreen {
         addBookF.add(authorT);
     }
 
-    public void saveButton() {
+    public void AddButton() {
         saveBook = new JButton("ADD");
-        saveBook.setBounds(100, 140, 60, 20);
+        saveBook.setBounds(100, 140, 70, 20);
         addBookF.add(saveBook);
         saveBook.addActionListener(new ActionListener() {
             @Override
@@ -72,7 +71,7 @@ public class AddBookScreen {
 
     public void closeButton() {
         closeB = new JButton("Close");
-        closeB.setBounds(250, 140, 60, 20);
+        closeB.setBounds(250, 140, 70, 20);
         addBookF.add(closeB);
 
         closeB.addActionListener(new ActionListener() {
@@ -88,7 +87,7 @@ public class AddBookScreen {
 
         addContactFrame();
         enterContactDetails();
-        saveButton();
+        AddButton();
         closeButton();
 
         addBookF.setVisible(true);

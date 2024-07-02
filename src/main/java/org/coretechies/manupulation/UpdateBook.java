@@ -30,7 +30,7 @@ public class UpdateBook {
         }
     }
 
-    public void updateChanges() throws SQLException {
+    public void updateChanges(Connection connection) throws SQLException {
 
         String name = nameT.getText();
         String subject = subjectT.getText();
@@ -40,8 +40,11 @@ public class UpdateBook {
                 "WHERE ID = " + idc + ";";
 
         if (!name.isBlank() && !subject.isBlank() && !author.isBlank()) {
+            st = connection.createStatement();
             st.executeUpdate(updateQ);
+            addBookF.dispose();
             JOptionPane.showMessageDialog(mainFrame,"Book Updated Success fully");
+
             allow = true;
         }
         else {

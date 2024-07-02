@@ -32,19 +32,19 @@ public class UpdateBookUi {
 
         public void updateUi(){
             saveUpdate = new JButton("Save");
-            saveUpdate.setBounds(100,140,60,20);
+            saveUpdate.setBounds(100,140,70,20);
             addBookF.add(saveUpdate);
             saveUpdate.addActionListener(e -> {
                 UpdateBook update = new UpdateBook();
                 try {
-                    update.updateChanges();
+                    update.updateChanges(CreateConnection.connectDB());
+                    idc = 0;
+                    addBookF.dispose();
+                    UpdateBooksTable printUpdate = new UpdateBooksTable();
+                    printUpdate.printTable(CreateConnection.connectDB());
                 } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
+                    JOptionPane.showMessageDialog(addBookF," Error : the Character should be less than 20 ");
                 }
-                idc = 0;
-                addBookF.dispose();
-                UpdateBooksTable printUpdate = new UpdateBooksTable();
-                printUpdate.printTable(CreateConnection.connectDB());
             });
 
         }

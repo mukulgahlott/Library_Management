@@ -73,7 +73,9 @@ public class UpdateBooksTable {
                 case "AuthorD" -> sortQuery = sortQueryAD;
                 case "SubjectD" -> sortQuery = sortQuerySD;
                 case "NameD" -> sortQuery = sortQueryND;
-                default -> sortQuery = sortQueryN;
+                case "Name" -> sortQuery = sortQueryN;
+                case " IDD" -> sortQuery = "SELECT * FROM book ORDER BY id desc;";
+                default -> sortQuery = "SELECT * FROM book ORDER BY Id;";
             }
 // Print the table on LibraryManagement home screen
             st = connection.createStatement();
@@ -106,6 +108,7 @@ public class UpdateBooksTable {
     //delete Book from database
     public void delete(Connection connection) {
         try {
+            boolean i = true;
             boolean deleteIndex = false;
             for (int j = 0; j < bookDetail.size(); j++) {
                 deleteIndex = (boolean) booksTable.getValueAt(j, 4);
@@ -115,7 +118,11 @@ public class UpdateBooksTable {
                     String DeleteQuery = "DELETE FROM book WHERE Id = " + id + ";";
                     st = connection.createStatement();
                     st.executeUpdate(DeleteQuery);
+                    i = false;
                 }
+            }
+            if (i) {
+                JOptionPane.showMessageDialog(mainFrame, "Please select check box to delete Book ");
             }
             if (searchT.getText().isBlank()) {
                 printTable(CreateConnection.connectDB());
@@ -140,15 +147,12 @@ public class UpdateBooksTable {
             try {
                 st = connection.createStatement();
                 addQ = st.executeUpdate(addQuery);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(addBookF, "Error : Some thing went wrong ");
+                printTable(CreateConnection.connectDB());
                 addBookF.dispose();
-
+                allow = true;
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(addBookF, "Error : the characters should be less than 20 ");
             }
-            printTable(CreateConnection.connectDB());
-            addBookF.dispose();
-            allow = true;
-
         } else {
             JOptionPane.showMessageDialog(addBookF, "Please fill the values");
         }
@@ -185,8 +189,9 @@ public class UpdateBooksTable {
                 name = showQ.getString("BookName");
                 subject = showQ.getString("Subject");
                 author = showQ.getString("Author");
+                String id = String.valueOf(showQ.getInt("id"));
 
-                if (name.toLowerCase().contains(key) | subject.toLowerCase().contains(key) | author.toLowerCase().contains(key)) {
+                if (id.toLowerCase().contains(key) | name.toLowerCase().contains(key) | subject.toLowerCase().contains(key) | author.toLowerCase().contains(key)) {
 
                     rowData = new Object[]{showQ.getInt("Id"), showQ.getString("BookName"), showQ.getString("Subject"), showQ.getString("Author"), showQ.getBoolean("Select1")};
                     searchTableModel.addRow(rowData);

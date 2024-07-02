@@ -86,7 +86,7 @@ public class LibraryManageUi {
 
     //  build ComboBox for short Books as user want
     public void comboBox() {
-        String[] choices = {"Name", "Subject", "Author",};
+        String[] choices = {" ID","Name", "Subject", "Author",};
         JComboBox<String> cb = new JComboBox<>(choices);
         cb.setBounds(365, 17, 105, 30);
         cb.setVisible(true);
