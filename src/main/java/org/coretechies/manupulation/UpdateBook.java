@@ -3,10 +3,12 @@ package org.coretechies.manupulation;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
 import javax.swing.*;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
-import static org.coretechies.connection.CreateConnection.st;
+
 import static org.coretechies.ui.AddBookScreen.*;
 import static org.coretechies.ui.LibraryManageUi.allow;
 import static org.coretechies.ui.LibraryManageUi.mainFrame;
@@ -15,9 +17,11 @@ import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
 
 public class UpdateBook {
     final String showQuery = "SELECT * FROM book where id = " + UpdateBooksTable.idc + ";";
+    Statement st;
 
 
-    public void fillUpdate() throws SQLException {
+    public void fillUpdate(Connection connection) throws SQLException {
+        st = connection.createStatement();
         ResultSet showQ = st.executeQuery(showQuery);
         while (showQ.next()) {
             nameT.setText(showQ.getString("BookName"));

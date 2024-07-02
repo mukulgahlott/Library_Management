@@ -1,5 +1,6 @@
 package org.coretechies.ui;
 
+import org.coretechies.connection.CreateConnection;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
 import javax.swing.*;
@@ -64,7 +65,7 @@ public class AddBookScreen {
             @Override
             public void actionPerformed(ActionEvent e) {
                 UpdateBooksTable saveInDb = new UpdateBooksTable();
-                saveInDb.addBooksInTable();
+                saveInDb.addBooksInTable(CreateConnection.connectDB());
             }
         });
     }

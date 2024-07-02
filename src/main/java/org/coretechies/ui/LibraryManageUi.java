@@ -1,5 +1,6 @@
 package org.coretechies.ui;
 
+import org.coretechies.connection.CreateConnection;
 import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
@@ -30,7 +31,7 @@ public class LibraryManageUi {
     public static JButton addNewBook, delete, edit;
     protected JLabel searchL;
     public static JTextField searchT;
-    public static DefaultTableModel tableModel;
+    public  DefaultTableModel tableModel;
     public static String selectedItem = "";
     UpdateBooksTable showBook = new UpdateBooksTable();
 
@@ -73,10 +74,10 @@ public class LibraryManageUi {
             private void searchAndUpdate() {
                 String searchText = searchT.getText();
                 if (searchText.isBlank()) {
-                    showBook.printTable();
+                    showBook.printTable(CreateConnection.connectDB());
                 } else {
                     UpdateBooksTable searching = new UpdateBooksTable();
-                    searching.search();
+                    searching.search(CreateConnection.connectDB());
                 }
             }
         });
@@ -99,10 +100,9 @@ public class LibraryManageUi {
                 if (selectedItem.equals(s)) {
                     selectedItem = (String) cb.getSelectedItem() + "D";
                     UpdateBooksTable sortTable = new UpdateBooksTable();
-                    sortTable.printTable();
+                    sortTable.printTable(CreateConnection.connectDB());
                 } else {
-
-                    showBook.printTable();
+                    showBook.printTable(CreateConnection.connectDB());
                 }
             }
         });
@@ -117,14 +117,14 @@ public class LibraryManageUi {
         booksPanel.setLayout(new BorderLayout());
         mainFrame.add(booksPanel);
 
-        tableModel = new DefaultTableModel(new String[]{"ID","NAME", "SUBJECT", "AUTHOR","SELECT"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID", "NAME", "SUBJECT", "AUTHOR", "SELECT"}, 0);
 
         booksTable = new JTable(tableModel);
         booksTable.getTableHeader().setReorderingAllowed(false);
 
         booksPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
         // Refresh the table to display data
-        showBook.printTable();
+        showBook.printTable(CreateConnection.connectDB());
     }
 
     // edit button to Update the contacts
@@ -141,13 +141,12 @@ public class LibraryManageUi {
                     showUpdateUi.updateScreen();
                     try {
                         UpdateBook fill = new UpdateBook();
-                        fill.fillUpdate();
+                        fill.fillUpdate(CreateConnection.connectDB());
                     } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
+                        JOptionPane.showMessageDialog(mainFrame, "Data does not Exist ");
                     }
                 } else {
                     //alert the user that the frame is already open
-                    //I recommend a JOptionPane such as this
                     JOptionPane.showMessageDialog(mainFrame, "A window is already open");
                 }
             } else {
@@ -181,12 +180,13 @@ public class LibraryManageUi {
         mainFrame.add(delete);
         delete.addActionListener(e -> {
             UpdateBooksTable del = new UpdateBooksTable();
-            del.delete();
+            del.delete(CreateConnection.connectDB());
 
 
         });
 
     }
+
     public void deSelect() {
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
             @Override
@@ -196,12 +196,13 @@ public class LibraryManageUi {
                     int row = booksTable.rowAtPoint(mevent.getPoint());
                     if (row == -1) {
                         booksTable.clearSelection();
-                        idc =0;
+                        idc = 0;
                     }
                 }
             }
         }, AWTEvent.MOUSE_EVENT_MASK);
     }
+
     // Function to show ContactBookScreen
     public void showBookManagementScreen() {
         contactHomeFrame();

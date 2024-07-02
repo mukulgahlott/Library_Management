@@ -1,5 +1,6 @@
 package org.coretechies.ui;
 
+import org.coretechies.connection.CreateConnection;
 import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateBooks.UpdateBooksTable;
 
@@ -9,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import static org.coretechies.ui.AddBookScreen.addBookF;
 
@@ -42,7 +44,7 @@ public class UpdateBookUi {
                 idc = 0;
                 addBookF.dispose();
                 UpdateBooksTable printUpdate = new UpdateBooksTable();
-                printUpdate.printTable();
+                printUpdate.printTable(CreateConnection.connectDB());
             });
 
         }

@@ -1,19 +1,11 @@
 package org.coretechies.connection;
 
-import com.nqadmin.rowset.JdbcRowSetImpl;
-import javax.sql.RowSet;
-import javax.sql.RowSetEvent;
 import java.sql.*;
 
 
 public class CreateConnection {
 
-    RowSet rowSet = new JdbcRowSetImpl();
     private static CreateConnection instance;
-    final String url = "jdbc:mysql://localhost:3306/my_database";
-    final String user = "root";
-    final String password = "pass@123";
-    public static Statement st;
 
     //    Empty constructor
     private CreateConnection() {
@@ -29,12 +21,21 @@ public class CreateConnection {
     }
 
     //create connection with database
-    public void connectDB() {
+    public static Connection connectDB() {
         try {
+            final String url = "jdbc:mysql://localhost:3306/my_database";
+            final String user = "root";
+            final String password = "pass@123";
+            
             Connection con = DriverManager.getConnection(url, user, password);
-            st = con.createStatement();
+            Statement st = con.createStatement();
+            String query = "CREATE DATABASE IF NOT EXISTS my_database";
+            st.executeUpdate(query);
 
+            String query2 = "create table if not exists book ( id int auto_increment primary key,bookName varchar (30), subject varchar (30), author varchar (30));";
+            st.executeUpdate(query2);
 
+            return con;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
