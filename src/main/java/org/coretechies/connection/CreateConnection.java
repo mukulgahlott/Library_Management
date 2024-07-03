@@ -26,7 +26,7 @@ public class CreateConnection {
             final String url = "jdbc:mysql://localhost:3306/my_database";
             final String user = "root";
             final String password = "pass@123";
-            
+
             Connection con = DriverManager.getConnection(url, user, password);
             Statement st = con.createStatement();
             String query = "CREATE DATABASE IF NOT EXISTS my_database";

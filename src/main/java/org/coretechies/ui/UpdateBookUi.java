@@ -2,15 +2,13 @@ package org.coretechies.ui;
 
 import org.coretechies.connection.CreateConnection;
 import org.coretechies.manupulation.UpdateBook;
-import org.coretechies.ui.updateBooks.UpdateBooksTable;
+import org.coretechies.ui.updateTables.UpdateBooksTable;
 
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
+import static org.coretechies.ui.updateTables.UpdateBooksTable.idc;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import java.awt.*;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import static org.coretechies.ui.AddBookScreen.addBookF;
 
@@ -32,7 +30,7 @@ public class UpdateBookUi {
 
         public void updateUi(){
             saveUpdate = new JButton("Save");
-            saveUpdate.setBounds(100,140,70,20);
+            saveUpdate.setBounds(100, 220, 70, 20);
             addBookF.add(saveUpdate);
             saveUpdate.addActionListener(e -> {
                 UpdateBook update = new UpdateBook();
@@ -51,8 +49,8 @@ public class UpdateBookUi {
 
         public void updateScreen(){
         AddBookScreen show = new AddBookScreen();
-        show.addContactFrame();
-        show.enterContactDetails();
+        show.addBookFrame();
+        show.enterBookDetails();
         updatePanel();
         updateUi();
         show.closeButton();

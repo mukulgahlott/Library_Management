@@ -1,7 +1,7 @@
 package org.coretechies.ui;
 
 import org.coretechies.connection.CreateConnection;
-import org.coretechies.ui.updateBooks.UpdateBooksTable;
+import org.coretechies.ui.updateTables.UpdateBooksTable;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,15 +14,16 @@ import static org.coretechies.ui.LibraryManageUi.allow;
 public class AddBookScreen {
 
     public static JFrame addBookF;
-    protected JLabel nameL, subjectL, authorL;
-    public static JTextField nameT, subjectT, authorT;
+    protected JLabel nameL, subjectL, authorL,quantityL;
+    public static JTextField nameT, subjectT, authorT , quantityT;
     protected JButton saveBook, closeB;
 
-    public void addContactFrame() {
+    public void addBookFrame() {
 
         addBookF = new JFrame("Add and Update Book");
-        addBookF.setSize(380, 200);
+        addBookF.setSize(380, 300);
         addBookF.setLayout(null);
+        addBookF.setLocation(130,130);
 
         addBookF.addWindowListener(new WindowAdapter() {
             @Override
@@ -32,33 +33,41 @@ public class AddBookScreen {
         });
     }
 
-    public void enterContactDetails() {
+    public void enterBookDetails() {
 
-        nameL = new JLabel("Book Name :   ");
+        nameL = new JLabel("Book Name : ");
         nameL.setBounds(30, 10, 100, 20);
         subjectL = new JLabel("Subject :");
-        subjectL.setBounds(30, 40, 100, 20);
+        subjectL.setBounds(30, 60, 100, 20);
         authorL = new JLabel("Author Name :");
-        authorL.setBounds(30, 70, 100, 20);
+        authorL.setBounds(30, 110, 100, 20);
+        quantityL =new JLabel("Add Quantity : ");
+        quantityL.setBounds(30, 160, 100, 20);
+
 
         nameT = new JTextField(13);
         nameT.setBounds(150, 10, 200, 30);
         subjectT = new JTextField(13);
-        subjectT.setBounds(150, 40, 200, 30);
+        subjectT.setBounds(150, 55, 200, 30);
         authorT = new JTextField(13);
-        authorT.setBounds(150, 70, 200, 30);
+        authorT.setBounds(150, 105, 200, 30);
+        quantityT = new JTextField(3);
+        quantityT.setBounds(150, 160, 30, 25);
+
 
         addBookF.add(nameL);
         addBookF.add(nameT);
         addBookF.add(subjectL);
+        addBookF.add(quantityL);
         addBookF.add(subjectT);
         addBookF.add(authorL);
         addBookF.add(authorT);
+        addBookF.add(quantityT);
     }
 
     public void AddButton() {
         saveBook = new JButton("ADD");
-        saveBook.setBounds(100, 140, 70, 20);
+        saveBook.setBounds(100, 220, 70, 20);
         addBookF.add(saveBook);
         saveBook.addActionListener(new ActionListener() {
             @Override
@@ -71,7 +80,7 @@ public class AddBookScreen {
 
     public void closeButton() {
         closeB = new JButton("Close");
-        closeB.setBounds(250, 140, 70, 20);
+        closeB.setBounds(250, 220, 70, 20);
         addBookF.add(closeB);
 
         closeB.addActionListener(new ActionListener() {
@@ -85,8 +94,8 @@ public class AddBookScreen {
 
     public void showAddNewContactScreen() {
 
-        addContactFrame();
-        enterContactDetails();
+        addBookFrame();
+        enterBookDetails();
         AddButton();
         closeButton();
 

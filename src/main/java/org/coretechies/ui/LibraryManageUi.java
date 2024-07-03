@@ -1,8 +1,10 @@
 package org.coretechies.ui;
 
 import org.coretechies.connection.CreateConnection;
+import org.coretechies.manupulation.IssueBookLogic;
 import org.coretechies.manupulation.UpdateBook;
-import org.coretechies.ui.updateBooks.UpdateBooksTable;
+import org.coretechies.ui.updateTables.UpdateBooksTable;
+import org.coretechies.ui.updateTables.UpdateRecordBookTable;
 
 import java.awt.*;
 import java.awt.event.AWTEventListener;
@@ -16,9 +18,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
-import static org.coretechies.ui.updateBooks.UpdateBooksTable.idc;
+import static org.coretechies.ui.updateTables.UpdateBooksTable.idc;
 
 
 public class LibraryManageUi {
@@ -28,18 +29,19 @@ public class LibraryManageUi {
     public static JFrame mainFrame;
     protected JPanel booksPanel;
     public static JTable booksTable;
-    public static JButton addNewBook, delete, edit;
+    public static JButton addNewBook, delete, edit, issueB;
     protected JLabel searchL;
     public static JTextField searchT;
-    public  DefaultTableModel tableModel;
-    public static String selectedItem = "";
+    public DefaultTableModel tableModel;
+    public static String selectedSort = "";
     UpdateBooksTable showBook = new UpdateBooksTable();
+    public static String getSelectedTable = "BOOKS";
 
 
     // Build the main frame
-    public void contactHomeFrame() {
+    public void bookHomeFrame() {
         mainFrame = new JFrame("Library Management");
-        mainFrame.setSize(520, 540);
+        mainFrame.setSize(640, 540);
         mainFrame.setLayout(null); // Use absolute positioning
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -75,9 +77,20 @@ public class LibraryManageUi {
                 String searchText = searchT.getText();
                 if (searchText.isBlank()) {
                     showBook.printTable(CreateConnection.connectDB());
+                    try {
+                        RecordTableUi showRecord = new RecordTableUi();
+                        showRecord.printTable(CreateConnection.connectDB());
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(mainFrame, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
-                    UpdateBooksTable searching = new UpdateBooksTable();
-                    searching.search(CreateConnection.connectDB());
+                    if (getSelectedTable.equals("ISSUE RECORD")) {
+                        UpdateRecordBookTable searching = new UpdateRecordBookTable();
+                        searching.searchRecord(CreateConnection.connectDB());
+                    } else {
+                        UpdateBooksTable searching = new UpdateBooksTable();
+                        searching.search(CreateConnection.connectDB());
+                    }
                 }
             }
         });
@@ -85,8 +98,8 @@ public class LibraryManageUi {
     }
 
     //  build ComboBox for short Books as user want
-    public void comboBox() {
-        String[] choices = {" ID","Name", "Subject", "Author",};
+    public void sortComboBox() {
+        String[] choices = {" ID", "Name", "Subject", "Author",};
         JComboBox<String> cb = new JComboBox<>(choices);
         cb.setBounds(365, 17, 105, 30);
         cb.setVisible(true);
@@ -94,11 +107,11 @@ public class LibraryManageUi {
         cb.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String s = selectedItem;
-                selectedItem = (String) cb.getSelectedItem();
-                assert selectedItem != null;
-                if (selectedItem.equals(s)) {
-                    selectedItem = (String) cb.getSelectedItem() + "D";
+                String s = selectedSort;
+                selectedSort = (String) cb.getSelectedItem();
+                assert selectedSort != null;
+                if (selectedSort.equals(s)) {
+                    selectedSort = (String) cb.getSelectedItem() + "D";
                     UpdateBooksTable sortTable = new UpdateBooksTable();
                     sortTable.printTable(CreateConnection.connectDB());
                 } else {
@@ -108,16 +121,45 @@ public class LibraryManageUi {
         });
     }
 
+    public void tableChangeComboBox(String[] choices) {
+        JComboBox<String> chose = new JComboBox<>(choices);
+        chose.setBounds(480, 17, 105, 30);
+        chose.setVisible(true);
+        mainFrame.add(chose);
+        chose.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                getSelectedTable = (String) chose.getSelectedItem();
+                if (getSelectedTable.equals("ISSUE RECORD")) {
+                    mainFrame.dispose();
+                    RecordTableUi recordTable = new RecordTableUi();
+                    try {
+                        recordTable.showRecords();
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    mainFrame.dispose();
+                    showBookManagementScreen();
+                }
+
+            }
+        });
+    }
+
+
     // Build contact panel to display saved contacts
     public void contactTablePanel() {
 
         booksPanel = new JPanel();
         booksPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Books", TitledBorder.LEFT, TitledBorder.TOP));
-        booksPanel.setBounds(20, 60, 443, 400);
+        booksPanel.setBounds(20, 60, 580, 400);
         booksPanel.setLayout(new BorderLayout());
         mainFrame.add(booksPanel);
 
-        tableModel = new DefaultTableModel(new String[]{"ID", "NAME", "SUBJECT", "AUTHOR", "SELECT"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID", "NAME", "SUBJECT", "AUTHOR", "QUANTITY", "ISSUED", "REMAIN", "SELECT"}, 0);
 
         booksTable = new JTable(tableModel);
         booksTable.getTableHeader().setReorderingAllowed(false);
@@ -187,6 +229,33 @@ public class LibraryManageUi {
 
     }
 
+    public void issueBook() {
+        issueB = new JButton("Issue Book");
+        issueB.setBounds(405, 470, 100, 30);
+        mainFrame.add(issueB);
+        issueB.addActionListener(e -> {
+            if (idc != 0) {
+                if (allow) {
+                    allow = false;
+                    IssueBookToStudentUi showPanel = new IssueBookToStudentUi();
+                    showPanel.showIssueScreen();
+                    IssueBookLogic fill = new IssueBookLogic();
+                    try {
+                        fill.fillBookDetails(CreateConnection.connectDB());
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "A window is already open");
+                }
+            } else {
+                JOptionPane.showMessageDialog(mainFrame, "Please select the book ");
+            }
+
+        });
+
+    }
+
     public void deSelect() {
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
             @Override
@@ -205,13 +274,15 @@ public class LibraryManageUi {
 
     // Function to show ContactBookScreen
     public void showBookManagementScreen() {
-        contactHomeFrame();
+        bookHomeFrame();
         searchUi();
-        comboBox();
+        sortComboBox();
+        tableChangeComboBox(new String[]{"BOOKS", "ISSUE RECORD"});
         contactTablePanel();
         editButton();
         addBook();
         deleteBook();
+        issueBook();
         deSelect();
         mainFrame.setVisible(true);
 
