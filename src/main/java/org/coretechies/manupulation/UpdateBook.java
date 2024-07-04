@@ -35,19 +35,20 @@ public class UpdateBook {
         String name = nameT.getText();
         String subject = subjectT.getText();
         String author = authorT.getText();
-        int quantity =0;
         try {
-             quantity = Integer.parseInt(quantityT.getText());
+
             String updateQ = "UPDATE Book " +
-                    "SET BookName = '" + name + "', Subject = '" + subject + "', Author = '" + author + "'Quantity = "+ quantity  +
-                    "WHERE ID = " + idc + ";";
+                    "SET BookName = '" + name + "', Subject = '" + subject + "', Author = '" + author +
+                    "' WHERE ID = " + idc + ";";
+            String RecordUpdate ="UPDATE record Set BookName = '"+name+"' where BookID = " + idc + ";";
 
             if (!name.isBlank() && !subject.isBlank() && !author.isBlank()) {
                 st = connection.createStatement();
                 st.executeUpdate(updateQ);
+                st.executeUpdate(RecordUpdate);
                 addBookF.dispose();
                 JOptionPane.showMessageDialog(mainFrame, "Book Updated Success fully");
-
+                idc = 0;
                 allow = true;
             }
 

@@ -42,15 +42,24 @@ public class IssueBookLogic {
 
             if (!enroll.isBlank() && !Objects.requireNonNull(cls).isBlank()) {
                 st = connection.createStatement();
-                st.executeUpdate(InsertQ);
                 ResultSet rs = st.executeQuery(SelectQ);
                 if (rs.next()) {
                     int issue = rs.getInt("Issued");
                     int remain = rs.getInt("remain");
-                    issue++;
-                    remain--;
-                    String updateQ = "update book set issued = " + issue + ", remain =" + remain + " where id =" + id + ";";
-                    st.executeUpdate(updateQ);
+                    if (remain > 0) {
+                        issue++;
+                        remain--;
+                        String updateQ = "update book set issued = " + issue + ", remain =" + remain + " where id =" + id + ";";
+                        st.executeUpdate(InsertQ);
+                        st.executeUpdate(updateQ);
+                    }
+                    else {
+                        allow = true;
+                        issueBookF.dispose();
+                        JOptionPane.showMessageDialog(mainFrame,"This Book does not Available");
+
+
+                    }
                 }
                 allow = true;
                 issueBookF.dispose();

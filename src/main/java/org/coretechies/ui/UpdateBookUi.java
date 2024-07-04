@@ -4,10 +4,13 @@ import org.coretechies.connection.CreateConnection;
 import org.coretechies.manupulation.UpdateBook;
 import org.coretechies.ui.updateTables.UpdateBooksTable;
 
+import static org.coretechies.ui.LibraryManageUi.allow;
 import static org.coretechies.ui.updateTables.UpdateBooksTable.idc;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
 import static org.coretechies.ui.AddBookScreen.addBookF;
@@ -26,6 +29,13 @@ public class UpdateBookUi {
         uPanel.setBounds(20, 20, 360, 300);
         uPanel.setLayout(null);
 
+        addBookF.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                allow = true;
+            }
+        });
+
     }
 
         public void updateUi(){
@@ -36,8 +46,6 @@ public class UpdateBookUi {
                 UpdateBook update = new UpdateBook();
                 try {
                     update.updateChanges(CreateConnection.connectDB());
-                    idc = 0;
-                    addBookF.dispose();
                     UpdateBooksTable printUpdate = new UpdateBooksTable();
                     printUpdate.printTable(CreateConnection.connectDB());
                 } catch (SQLException ex) {

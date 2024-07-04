@@ -42,7 +42,6 @@ public class AddBookScreen {
         authorL = new JLabel("Author Name :");
         authorL.setBounds(30, 110, 100, 20);
         quantityL =new JLabel("Add Quantity : ");
-        quantityL.setBounds(30, 160, 100, 20);
 
 
         nameT = new JTextField(13);
@@ -51,17 +50,24 @@ public class AddBookScreen {
         subjectT.setBounds(150, 55, 200, 30);
         authorT = new JTextField(13);
         authorT.setBounds(150, 105, 200, 30);
-        quantityT = new JTextField(3);
-        quantityT.setBounds(150, 160, 30, 25);
 
 
         addBookF.add(nameL);
         addBookF.add(nameT);
         addBookF.add(subjectL);
-        addBookF.add(quantityL);
         addBookF.add(subjectT);
         addBookF.add(authorL);
         addBookF.add(authorT);
+
+    }
+    public void setQuantity(){
+        quantityL =new JLabel("Add Quantity : ");
+        quantityL.setBounds(30, 160, 100, 20);
+
+        quantityT = new JTextField(3);
+        quantityT.setBounds(150, 160, 30, 25);
+
+        addBookF.add(quantityL);
         addBookF.add(quantityT);
     }
 
@@ -96,6 +102,7 @@ public class AddBookScreen {
 
         addBookFrame();
         enterBookDetails();
+        setQuantity();
         AddButton();
         closeButton();
 
